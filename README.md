@@ -1,4 +1,4 @@
-# GeoComply Assignment
+# GEOCOMPLY Assignment
 
 ### Executing program
   ```

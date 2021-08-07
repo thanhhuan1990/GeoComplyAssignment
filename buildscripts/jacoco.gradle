@@ -1,0 +1,38 @@
+apply plugin:  'jacoco'
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+task fullCoverageReport(type: JacocoReport) {
+    group = "Reporting"
+    dependsOn 'test'
+    dependsOn 'jacocoTestReport'
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = [
+            '**/BR.*',
+            '**/R.class',
+            '**/R$*.class',
+            '**/BuildConfig.*',
+            '**/*Test*.*',
+            '**/*_MembersInjector.*',
+    ]
+    def javaClasses = fileTree(dir: "${buildDir}/intermediates/javac/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    getClassDirectories().setFrom(files([javaClasses]))
+    getSourceDirectories().setFrom(files([mainSrc]))
+    getExecutionData().setFrom(fileTree(dir: "$buildDir", includes: [
+            "jacoco/testDebugUnitTest.exec",
+            "outputs/code-coverage/connected/*coverage.ec"
+    ]))
+}
